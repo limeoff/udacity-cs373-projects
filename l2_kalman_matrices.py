@@ -145,11 +145,20 @@ class matrix:
 
 def kalman_filter(x, P):
     for n in range(len(measurements)):
+        # measurement update
+        s = H * P * H.transpose() + R
+        k = P * H.transpose() * s.inverse()
+        #print(matrix([[measurements[n], 0.]]))
+        #print(H * x)
+        y = matrix([[measurements[n]]]) - H * x
 
-    # measurement update
+        x = x + k * y
 
-    # prediction
+        P = (I - k * H) * P
 
+        # prediction
+        x = F * x + u
+        P = F * P * F.transpose()
     return x, P
 
 
