@@ -2,7 +2,7 @@
 p=[0.2, 0.2, 0.2, 0.2, 0.2] #prior uniform distribution
 #p = [0, 1, 0, 0, 0]  # for movement quiz
 world = ['green', 'red', 'red', 'green', 'green']
-measurements = ['red', 'red']  # making n measurements
+measurements = ['red', 'green']  # making n measurements
 motions = [1, 1]
 pHit = 0.6
 pMiss = 0.2
