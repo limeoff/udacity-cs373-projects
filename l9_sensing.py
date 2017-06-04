@@ -100,7 +100,7 @@ class robot:
         for i in landmarks:
             delta_x = i[1] - self.x
             delta_y = i[0] - self.y
-            brng = (atan2(delta_y, delta_x) %(2*pi)) - self.orientation
+            brng = (atan2(delta_y, delta_x) - self.orientation) %(2*pi)
             print(i)
             Z.append(brng)
         return Z  # Leave this line here. Return vector Z of 4 bearings.
