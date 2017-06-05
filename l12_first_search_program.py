@@ -15,7 +15,7 @@
 #   0 = Navigable space
 #   1 = Occupied space
 
-grid = [[2, 0, 1, 0, 0, 0],
+grid = [[0, 0, 1, 0, 0, 0],
         [0, 0, 1, 0, 0, 0],
         [0, 0, 0, 0, 1, 0],
         [0, 0, 1, 1, 1, 0],
@@ -33,18 +33,39 @@ delta_name = ['^', '<', 'v', '>']
 
 
 def search(grid,init,goal,cost):
-
-    open = [0] + init  # initial open list [cost, x, y]
-
+    open_list = []
+    closed_list = []
+    open_list.append([0] + init)  # initial open list [cost, x, y]
     #expand
+    print(open_list)
+    c = 0
+
+    for i in range(len(open_list)):
+
+        take_list_item = open_list[i]
+        open_list.remove(open_list[i])
+        closed_list.append(i)
+        c += 1
+        new_open_list = []
+        for d in delta:
+            row = take_list_item[1]+d[0]
+            col = take_list_item[2]+d[1]
+
+            if grid[row][col] == 0 and (row >= 0) and (col >= 0):
+                new_open_list.append([c, row, col])
+                #print(grid[(take_list_item[1]+d[0])][(take_list_item[2]+d[1])])
+
+        #open_list = new_open_list
+
+        print(open_list)
 
     #gValue
 
+
     #take list
 
-    grid[init[0]][init[1]]
+    path=grid[init[0]][init[1]]
 
-    print(expansion)
 
     return path
 
