@@ -127,10 +127,11 @@ class robot:
 
         ############# ONLY ADD/MODIFY CODE BELOW HERE ###################
 
-        # --------
-        # move:
-        #
+    # --------
+    # move:
+    #
 
+    def move(self, motion):
         # copy your code from the previous exercise
         # and modify it so that it simulates motion noise
         # according to the noise parameters
@@ -139,14 +140,62 @@ class robot:
 
 
 
-        # --------
-        # sense:
-        #
+        # STATE - x,y, orienation(theta)
+        x = self.x
+        y = self.y
+        theta = self.orientation
 
+        # steering angle alfa
+        alfa = motion[0]
+        # apply noise
+        alfa = random.gauss(alfa, self.steering_noise)
+        # car length
+        L = self.length
+        # distance forward
+        d = motion[1]
+        # apply noise
+        d = random.gauss(d, self.distance_noise)
+
+        # turning angle beta
+        beta = d / L * tan(alfa)
+
+        if beta < .001:
+            self.x = x + d * cos(theta)
+            self.y = y + d * sin(theta)
+        else:
+            # turning radius R
+            R = d / beta
+            cx = x - sin(theta) * R
+            cy = y + cos(theta) * R
+            # after motion
+            self.x = cx + sin(theta + beta) * R
+            self.y = cy - cos(theta + beta) * R
+            self.orientation = (theta + beta) % (2. * pi)
+
+        return self
+
+    # --------
+    # sense:
+    #
+
+    def sense(self, noise):  # do not change the name of this function
         # copy your code from the previous exercise
         # and modify it so that it simulates bearing noise
         # according to
         #           self.bearing_noise
+
+        Z = []
+
+        for i in landmarks:
+                delta_x = i[1] - self.x
+                delta_y = i[0] - self.y
+                brng = (atan2(delta_y, delta_x) - self.orientation) % (2 * pi)
+                if noise:
+                    brng = random.gauss(brng, self.bearing_noise)
+                print(i)
+                Z.append(brng)
+
+        return Z
 
         ############## ONLY ADD/MODIFY CODE ABOVE HERE ####################
 
@@ -261,19 +310,20 @@ def particle_filter(motions, measurements, N=500):  # I know it's tempting, but 
             w.append(p[i].measurement_prob(measurements[t]))
 
         # resampling
-        # p3 = []
-        # index = int(random.random() * N)
-        # beta = 0.0
-        # mw = max(w)
-        # for i in range(N):
-        #     beta += random.random() * 2.0 * mw
-        #     while beta > w[index]:
-        #         beta -= w[index]
-        #         index = (index + 1) % N
-        #     p3.append(p[index])
-        # p = p3
+        p3 = []
+        index = int(random.random() * N)
+        beta = 0.0
+        mw = max(w)
+        for i in range(N):
+            beta += random.random() * 2.0 * mw
+            while beta > w[index]:
+                beta -= w[index]
+                index = (index + 1) % N
+            p3.append(p[index])
+        p = p3
 
-        p = random.choices(p, w, k=N)
+        # p = random.choices(p, w, k=N)
+        # giving error
 
     return get_position(p)
 
@@ -299,17 +349,17 @@ def particle_filter(motions, measurements, N=500):  # I know it's tempting, but 
 ##    vector near [x=93.476 y=75.186 orient=5.2664], that is, the
 ##    robot's true location.
 ##
-##motions = [[2. * pi / 10, 20.] for row in range(8)]
-##measurements = [[4.746936, 3.859782, 3.045217, 2.045506],
-##                [3.510067, 2.916300, 2.146394, 1.598332],
-##                [2.972469, 2.407489, 1.588474, 1.611094],
-##                [1.906178, 1.193329, 0.619356, 0.807930],
-##                [1.352825, 0.662233, 0.144927, 0.799090],
-##                [0.856150, 0.214590, 5.651497, 1.062401],
-##                [0.194460, 5.660382, 4.761072, 2.471682],
-##                [5.717342, 4.736780, 3.909599, 2.342536]]
-##
-##print particle_filter(motions, measurements)
+motions = [[2. * pi / 10, 20.] for row in range(8)]
+measurements = [[4.746936, 3.859782, 3.045217, 2.045506],
+                [3.510067, 2.916300, 2.146394, 1.598332],
+                [2.972469, 2.407489, 1.588474, 1.611094],
+                [1.906178, 1.193329, 0.619356, 0.807930],
+                [1.352825, 0.662233, 0.144927, 0.799090],
+                [0.856150, 0.214590, 5.651497, 1.062401],
+                [0.194460, 5.660382, 4.761072, 2.471682],
+                [5.717342, 4.736780, 3.909599, 2.342536]]
+
+print(particle_filter(motions, measurements))
 
 ## 2) You can generate your own test cases by generating
 ##    measurements using the generate_ground_truth function.
