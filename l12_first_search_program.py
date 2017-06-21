@@ -15,11 +15,18 @@
 #   0 = Navigable space
 #   1 = Occupied space
 
-grid = [[0, 0, 1, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0],
-        [0, 0, 1, 1, 1, 0],
-        [0, 0, 0, 0, 1, 0]]
+grid2 = [[0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0]]
+
+grid = [[0, 1, 1, 1, 1],
+        [0, 1, 0, 0, 0],
+        [0, 0, 0, 1, 0],
+        [1, 1, 1, 1, 0],
+        [0, 0, 0, 1, 0]]
+
 init = [0, 0]
 goal = [len(grid)-1, len(grid[0])-1]
 cost = 1
@@ -31,42 +38,63 @@ delta = [[-1, 0],  # go up
 
 delta_name = ['^', '<', 'v', '>']
 
-
 def search(grid,init,goal,cost):
-    open_list = []
-    closed_list = []
-    open_list.append([0] + init)  # initial open list [cost, x, y]
+    closed_list = [[0 for row in range(len(grid[0]))] for col in range(len(grid))]
+
+    closed_list[init[0]][init[1]] = 1
+    expand_list = [[-1 for row in range(len(grid[0]))] for col in range(len(grid))]
+    expand_list[init[0]][init[1]] = 0
+    expand_list_prev = expand_list[init[0]][init[1]]
     #expand
-    print(open_list)
-    c = 0
+    x = init[0]
+    y = init[1]
+    g = 0
+    open_list = [[g, x, y]]  # initial open list [cost, x, y]
+    print('\n'.join([''.join(['{:4}'.format(item) for item in row])
+                     for row in expand_list]))
 
-    for i in range(len(open_list)):
+    found = False
+    resign = False
 
-        take_list_item = open_list[i]
-        open_list.remove(open_list[i])
-        closed_list.append(i)
-        c += 1
-        new_open_list = []
-        for d in delta:
-            row = take_list_item[1]+d[0]
-            col = take_list_item[2]+d[1]
+    while found is False and resign is False:
+        if len(open_list) == 0:
+            resign = True
+            #print('fail')
+        else:
+            open_list.sort(reverse=True)
+            print(open_list)
+            next_item = open_list.pop()
+            x = next_item[1]
+            y = next_item[2]
+            g = next_item[0]
+            #print('take item', next_item)
+            #print(open_list)
 
-            if grid[row][col] == 0 and (row >= 0) and (col >= 0):
-                new_open_list.append([c, row, col])
-                #print(grid[(take_list_item[1]+d[0])][(take_list_item[2]+d[1])])
+            if x == goal[0] and y == goal[1]:
+                found = True
+                print('goal is', next_item)
+            else:
+                for i in range(len(delta)):
+                    x2 = x + delta[i][0]
+                    y2 = y + delta[i][1]
 
-        #open_list = new_open_list
+                    if x2 >= 0 and x2 < len(grid) and y2 >= 0 and y2 < len(grid[0]):
+                        if closed_list[x2][y2] == 0 and grid[x2][y2] == 0:
+                            g2 = g + cost
+                            open_list.append([g2, x2, y2])
+                            closed_list[x2][y2] = 1
+                            expand_list[x2][y2] = expand_list_prev + 1
+                            expand_list_prev = expand_list[x2][y2]
+                            #print(g2,x2,y2)
+    path = next_item
 
-        print(open_list)
-
-    #gValue
-
-
-    #take list
-
-    path=grid[init[0]][init[1]]
+    #print(closed_list)
+    return expand_list
 
 
-    return path
-
-search(grid,init,goal,cost)
+A = search(grid,init,goal,cost)
+print('\n'.join([''.join(['{:4}'.format(item) for item in row])
+      for row in A]))
+A = search(grid2,init,goal,cost)
+print('\n'.join([''.join(['{:4}'.format(item) for item in row])
+      for row in A]))
