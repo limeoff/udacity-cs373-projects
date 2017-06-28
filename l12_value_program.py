@@ -8,8 +8,13 @@
 # If a cell is a wall or it is impossible to reach the goal from a cell,
 # assign that cell a value of 99.
 # ----------
-
 grid = [[0, 1, 0, 0, 0, 0],
+        [0, 1, 1, 0, 1, 0],
+        [0, 0, 0, 0, 1, 0],
+        [0, 1, 1, 1, 1, 0],
+        [0, 1, 0, 1, 1, 0]]
+
+grid2 = [[0, 1, 0, 0, 0, 0],
         [0, 1, 0, 0, 0, 0],
         [0, 1, 0, 0, 0, 0],
         [0, 1, 0, 0, 0, 0],
@@ -32,7 +37,8 @@ def compute_value(grid, goal, cost):
 
     closed_list = [[99 for col in range(len(grid[0]))] for row in range(len(grid))]
     closed_list[goal[0]][goal[1]] = 0
-
+    path_list = [[' ' for col in range(len(grid[0]))] for row in range(len(grid))]
+    path_list[goal[0]][goal[1]] = '*'
     x = goal[0]
     y = goal[1]
     v = 0
@@ -42,7 +48,7 @@ def compute_value(grid, goal, cost):
     while not resign:
         if len(open_list) == 0:
             resign = True
-            print('resigning')
+            #print('resigning')
         else:
             open_list.sort(reverse=True)
             next_item = open_list.pop()
@@ -59,12 +65,14 @@ def compute_value(grid, goal, cost):
                     v2 = v + cost
                     open_list.append([v2, x2, y2])
                     closed_list[x2][y2] = v2
+                    path_list[x2][y2] = delta_name[(i-2)%4]
 
 
     value = closed_list
+    policy = path_list
     # make sure your function returns a grid of values as
     # demonstrated in the previous video.
-    return value
+    return policy
 
 A = compute_value(grid,goal,cost)
 print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in A]))
