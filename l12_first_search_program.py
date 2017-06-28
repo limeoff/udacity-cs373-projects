@@ -15,20 +15,15 @@
 #   0 = Navigable space
 #   1 = Occupied space
 
-grid2 = [[0, 0, 1, 0, 0, 0],
+grid = [[0, 0, 1, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 1, 0],
         [0, 0, 1, 0, 1, 0],
         [0, 0, 1, 0, 1, 0]]
 
-grid = [[0, 1, 1, 1, 1],
-        [0, 1, 0, 0, 0],
-        [0, 0, 0, 1, 0],
-        [1, 1, 1, 1, 0],
-        [0, 0, 0, 1, 0]]
-
 init = [0, 0]
 goal = [len(grid)-1, len(grid[0])-1]
+#goal = [0, 5]
 cost = 1
 
 delta = [[-1, 0],  # go up
@@ -39,30 +34,30 @@ delta = [[-1, 0],  # go up
 delta_name = ['^', '<', 'v', '>']
 
 def search(grid,init,goal,cost):
-    closed_list = [[0 for row in range(len(grid[0]))] for col in range(len(grid))]
+    closed_list = [[0 for col in range(len(grid[0]))] for row in range(len(grid))]
 
     closed_list[init[0]][init[1]] = 1
-    expand_list = [[-1 for row in range(len(grid[0]))] for col in range(len(grid))]
+    expand_list = [[-1 for col in range(len(grid[0]))] for row in range(len(grid))]
     expand_list[init[0]][init[1]] = 0
     expand_list_prev = expand_list[init[0]][init[1]]
+    path_list = [[' ' for col in range(len(grid[0]))] for row in range(len(grid))]
     #expand
     x = init[0]
     y = init[1]
     g = 0
     open_list = [[g, x, y]]  # initial open list [cost, x, y]
-    print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-                     for row in expand_list]))
+    #print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in closed_list]))
 
     found = False
     resign = False
 
-    while found is False and resign is False:
+    while not found  and not resign:
         if len(open_list) == 0:
             resign = True
-            #print('fail')
+            print('fail')
         else:
             open_list.sort(reverse=True)
-            print(open_list)
+            #print(open_list)
             next_item = open_list.pop()
             x = next_item[1]
             y = next_item[2]
@@ -80,21 +75,18 @@ def search(grid,init,goal,cost):
 
                     if x2 >= 0 and x2 < len(grid) and y2 >= 0 and y2 < len(grid[0]):
                         if closed_list[x2][y2] == 0 and grid[x2][y2] == 0:
+                            print(delta_name[delta.index(delta[i])])
                             g2 = g + cost
                             open_list.append([g2, x2, y2])
                             closed_list[x2][y2] = 1
                             expand_list[x2][y2] = expand_list_prev + 1
                             expand_list_prev = expand_list[x2][y2]
+                            path_list[x2][y2] = i
                             #print(g2,x2,y2)
     path = next_item
 
-    #print(closed_list)
     return expand_list
 
 
 A = search(grid,init,goal,cost)
-print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-      for row in A]))
-A = search(grid2,init,goal,cost)
-print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-      for row in A]))
+print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in A]))
