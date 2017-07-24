@@ -15,10 +15,10 @@ grid = [[0, 1, 0, 0, 0, 0],
         [0, 1, 0, 1, 1, 0]]
 
 grid2 = [[0, 1, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0],
-        [0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0]]
+         [0, 1, 0, 0, 0, 0],
+         [0, 1, 0, 0, 0, 0],
+         [0, 1, 0, 0, 0, 0],
+         [0, 0, 0, 0, 1, 0]]
 goal = [len(grid) - 1, len(grid[0]) - 1]
 cost = 1  # the cost associated with moving from a cell to an adjacent one
 
@@ -60,12 +60,11 @@ def compute_value(grid, goal, cost):
             x2 = x + delta[i][0]
             y2 = y + delta[i][1]
 
-            if x2 >= 0 and x2 < len(grid) and y2 >= 0 and y2 < len(grid[0]):
-                if closed_list[x2][y2] == 99 and grid[x2][y2] == 0:
-                    v2 = v + cost
-                    open_list.append([v2, x2, y2])
-                    closed_list[x2][y2] = v2
-                    path_list[x2][y2] = delta_name[(i-2)%4]
+            if 0 <= x2 < len(grid) and 0 <= y2 < len(grid[0]) and closed_list[x2][y2] == 99 and grid[x2][y2] == 0:
+                v2 = v + cost
+                open_list.append([v2, x2, y2])
+                closed_list[x2][y2] = v2
+                path_list[x2][y2] = delta_name[(i-2)%4]
 
 
     value = closed_list
@@ -74,5 +73,5 @@ def compute_value(grid, goal, cost):
     # demonstrated in the previous video.
     return policy
 
-A = compute_value(grid,goal,cost)
+A = compute_value(grid, goal, cost)
 print('\n'.join([''.join(['{:4}'.format(item) for item in row]) for row in A]))
